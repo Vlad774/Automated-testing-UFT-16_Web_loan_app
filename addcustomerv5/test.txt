@@ -1,0 +1,49 @@
+''***************************************************************
+'' ABC Automated Testing
+'' Copyright (C) 2022 ABC
+'' All rights Reserved Worldwide
+'' Unauthorized Duplication or Distribution Prohibited
+'' **************************************************************
+'' FILENAME: AddCustomer
+''***************************************************************
+'' ABOUT THIS FILE 
+'' AUTHOR IDENTITY:
+'' Initials                       Name/Company
+'' --------                     --------------------------
+''                               ABC INC
+'' REVISION HISTORY:
+'' DATE/Initils                 Comments
+'' -----------------              --------------------------
+'' 05/10/2022                  Created for ABC INC
+
+
+
+''*****************************************
+''SCRIPT
+
+
+
+
+For i =1 to 10
+
+	strFirstName = GenerateFirstName 
+	strLastName= GenerateLastName
+	strStreet= GenerateStreet 
+	strCity= GenerateCity
+	strProvince= GenerateProvince
+	strPostalCode= GeneratePostalCode
+	AddCustomer strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode
+
+
+Next
+
+
+
+
+
+
+
+
+
+
+

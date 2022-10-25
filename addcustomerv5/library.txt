@@ -1,0 +1,363 @@
+'''SUB PROCEDURES
+''*****************************************
+
+Sub LaunchLoanApp 
+   'launch LoanApp only and if it was not launched yet
+	If Browser("name:= Loan Management System - Login").Exist (1) Then
+		Reporter.ReportEvent micDone, "LoanApp", "LoanApp already opened."
+	Else
+		systemutil.Run "IExplore.exe", "http://test-hitekschool.com/lms/loans/2108"
+	End If
+End Sub
+
+''*****************************************
+
+Sub Login (strBranch, strUser, strPassword)
+
+	'enter branch name
+	Browser("Loan Management System").Page("Loan Management System").WebEdit("j_branch").Set strBranch
+
+	'enter branch admin username
+	Browser("Loan Management System").Page("Loan Management System").WebEdit("j_username").Set strUser
+
+	'enter branch admin password
+	Browser("Loan Management System").Page("Loan Management System").WebEdit("j_password").Set strPassword
+
+	'click button 'Login'
+	Browser("Loan Management System").Page("Loan Management System").WebButton("Login").Click
+
+End Sub
+
+''*****************************************
+
+Sub CloseLoanApp
+   'click button 'Logout'
+	
+	
+	Browser("Loan Management System").Page("Loan Management System_2").WebButton("Logout").Click
+	Browser("Loan Management System").Page("Loan Management System").Sync
+
+	'close browser
+	Browser("Loan Management System").CloseAllTabs
+
+	
+End Sub
+
+''*****************************************
+
+Sub FillInAddCustomerFields (strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode)
+	'set 'First name'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("FirstName").Set strFirstName
+	
+	'set 'Last name'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("LastName").Set strLastName
+	
+	'set 'Address'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("Street").Set strStreet
+	
+	'set 'City'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("City").Set strCity
+	
+	'set 'Province'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("Province").Set strProvince
+	
+	'set 'Postal Code'
+	Browser("Loan Management System").Page("Loan Management System_2").WebEdit("PostalCode").Set strPostalCode
+	Wait (3)
+	
+	'click button 'Save'
+	Browser("Loan Management System").Page("Loan Management System_2").WebButton("Save").Click
+	Wait (3)
+End Sub
+
+''*****************************************
+
+
+
+'-----------------------------------------------------
+
+Function ValidInputValidation (strFirstName)
+	Dim blnRet
+
+	If Browser("Loan Management System_3").Page("Loan Management System_3").WebElement("innerhtml:= " +   strFirstName + ".*").Exist (5) Then
+		'output results into Result file  
+		Reporter.ReportEvent micPass, "New User Creation", " User " + strFirstName + "exists"
+		blnRet = TRUE
+	Else
+		Reporter.ReportEvent micFail, "New User Creation", " User " + strFirstName + "does not exist"
+		blnRet = FALSE
+	End If
+
+	ValidImputValidation = blnRet
+End Function
+
+'
+'-----------------------------------------------------
+
+Function ValidateUserLogin (strUsername)
+	Dim blnRet
+
+	If Browser("Loan Management System_3").Page("Loan Management System_3").WebElement("innerhtml:= You login as: .*" + strUsername + ".*").Exist (5) Then
+		'output results into Result file  
+		Reporter.ReportEvent micPass, "New User Creation", " User " + strUsername + "login successfully"
+		blnRet = TRUE
+	Else
+		Reporter.ReportEvent micFail, "New User Creation", " User " + strUsername + "is not logged sucessfully"
+		blnRet = FALSE
+	End If
+
+	ValidateUserLogin = blnRet
+End Function
+
+
+
+
+
+Function InvalidInputValidation (strFirstName, strLastName)
+   Dim blnRet
+   If strUsername = "" Then
+            If Browser("Loan Management System").Page("Loan Management System_2").WebElement ("innerhtml:= Mandatory field 'strFirstName' is empty").Exist (5) Then
+                'output results into Result file 
+                Reporter.ReportEvent micPass, "VALIDATIONPOINT! Invalid Input Validation pass", " Error message Mandatory field 'First name' is empty appears"
+               blnRet = TRUE
+            End If
+        ElseIf strPassword = "" Then
+            If Browser("Loan Management System").Page("Loan Management System_2").WebElement ("innerhtml:= Mandatory field 'strLastName' is empty").Exist (0) Then
+                Reporter.ReportEvent micPass, "VALIDATIONPOINT! Invalid Input Validation pass", " Error message Mandatory field 'Last name' is empty appears"
+                blnRet = TRUE
+            End If
+        Else
+            Reporter.ReportEvent micFail, "VALIDATIONPOINT! Invalid Input Validation fail", " Proper error message does not appear!"
+            blnRet = FALSE
+        End If
+End Function
+
+
+'-----------------------------------------------------
+
+
+
+
+'-----------------------------------------------------
+
+Function AddCustomer (strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode)
+
+
+LaunchLoanApp   'a sub procedure call
+
+
+
+''validate that Login page is opened successfully
+
+If Browser("name:= Loan Management System - Login").Exist (1) Then
+
+     'output results into Result file  
+	  Reporter.ReportEvent micPass, "Login Page", " Was opened successfully"
+
+	'login as admin
+  Login "Manchester", "admin", "vvesninskiy0907" 'a sub procedure call
+  
+    
+      
+Else
+
+     Reporter.ReportEvent micFail, "Login Page", " Was not opened successfully. This step is failed!"
+     
+End If
+
+
+Wait (3)
+
+       'click button 'Customers' in main menu
+Browser("Loan Management System").Page("Loan Management System_2").WebButton("Customers").Click
+Wait (3)
+
+'click menu 'Action'
+Browser("Loan Management System").Page("Loan Management System_2").WebButton("Action").Click
+Wait (3)
+
+'click menu 'AddCustomer'
+Browser("Loan Management System").Page("Loan Management System_2").Link("Add Customer").Click
+Wait (3)
+
+
+FillInAddCustomerFields strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode 'a sub procedure call
+Wait (3)
+
+If strFirstName <> "" AND strLastName <> "" Then
+
+CloseLoanApp  'a sub procedure call
+LaunchLoanApp 'a sub procedure call
+Wait (3)
+
+''validate that Login page is opened successfully
+
+If Browser("name:= Loan Management System - Login").Exist (1) Then
+
+     'output results into Result file  
+	  Reporter.ReportEvent micPass, "Login Page", " Was opened successfully"
+
+	'login as admin
+  Login "Manchester", "admin", "vvesninskiy0907" 'a sub procedure call
+  
+    
+      
+Else
+
+     Reporter.ReportEvent micFail, "Login Page", " Was not opened successfully. This step is failed!"
+     
+End If
+
+Wait (3)
+
+'verify text  "You login as: user" is displayed
+
+
+Browser("Loan Management System").Page("Loan Management System_2").WebButton("Customers").Click
+Wait (3)
+
+InvalidInputValidation strFirstName, strLastName
+
+
+End If
+
+CloseLoanApp  'a sub procedure call
+
+End Function
+
+
+
+'-----------------------------------------------------
+
+
+	
+
+Function GenerateFirstName
+
+    Dim intLen, strFirstName 
+
+    'find a length of the string (that will generate number from 1 to 16)  
+    intLen = 1 + RandomNumber(0,15)  
+
+    'generate Username 
+    For i= 1 to intLen 
+
+        strFirstName = strFirstName + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GenerateFirstName= strFirstName 
+
+End Function
+
+'-----------------------------------------------------
+
+Function GenerateLastName
+
+    Dim intLen, strLastName 
+
+    'find a length of the string (that will generate number from 5 to 16)  
+    intLen = 5 + RandomNumber(0,11)  
+
+    'generate Username 
+    For i= 1 to intLen 
+
+        strLastName = strLastName + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GenerateLastName= strLastName 
+
+End Function
+
+'-----------------------------------------------------
+
+
+Function GenerateStreet 
+
+    Dim intLen, strStreet 
+
+    'find a length of the string (that will generate number from 0 to 32) 
+    intLen = 0 + RandomNumber(0,32) 
+
+    'generate first capital letter of the Street 
+    strStreet = Chr(RandomNumber(65,90)) 
+
+    'generate Street 
+    For i= 1 to intLen - 1 
+        strStreet = strStreet + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GenerateStreet = strStreet 
+
+End Function
+
+
+'-----------------------------------------------------
+
+Function GenerateCity 
+
+    Dim intLen, strCity 
+
+    'find a length of the string (that will generate number from 0 to 10) 
+    intLen = 0 + RandomNumber(0,32) 
+
+    'generate first capital letter of the City 
+    strLastName = Chr(RandomNumber(65,90)) 
+
+    'generate City 
+    For i= 1 to intLen - 1 
+        strCity = strCity + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GenerateCity = strCity 
+
+End Function
+
+'-----------------------------------------------------
+
+Function GenerateProvince 
+
+    Dim intLen, strProvince 
+
+    'find a length of the string (that will generate number from 0 to 2) 
+    intLen = 0 + RandomNumber(2,2) 
+
+    'generate first capital letter of the Company 
+    strProvince = Chr(RandomNumber(65,90)) 
+
+    'generate Province 
+    For i= 1 to intLen - 1 
+        strProvince = strProvince + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GenerateProvince = strProvince 
+
+End Function
+
+
+'-----------------------------------------------------
+
+
+Function GeneratePostalCode 
+
+    Dim intLen, strPostalCode 
+
+    'find a length of the string (that will generate number from 0 to 6) 
+    intLen = 0 + RandomNumber(6,6) 
+
+    'generate first capital letter of the Postal Code 
+    strPostalCode = Chr(RandomNumber(65,90)) 
+
+    'generate Province 
+    For i= 1 to intLen - 1 
+        strPostalCode = strPostalCode + Chr(RandomNumber(97,122)) 
+
+    Next 
+
+    GeneratePostalCode = strPostalCode 
+
+End Function
